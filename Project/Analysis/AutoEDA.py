@@ -44,8 +44,8 @@ def perform_eda(file_path):
     plt.tight_layout()
     plt.show()
 
-# example file path
-file_path = 'example.csv'
+    
+import AutoEDA
 
-# perform the exploratory data analysis
-perform_eda(file_path)
+file_path = 'example.csv'
+AutoEDA.perform_eda(file_path)
