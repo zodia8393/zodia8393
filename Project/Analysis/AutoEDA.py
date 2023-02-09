@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-def perform_eda(data):
-    # convert the input data into a Pandas dataframe
-    df = pd.DataFrame(data)
+def perform_eda(file_path):
+    # read the data from the specified file
+    df = pd.read_csv(file_path)
 
     # print the first 5 rows of the data
     print("First 5 rows of the data:")
@@ -44,12 +44,8 @@ def perform_eda(data):
     plt.tight_layout()
     plt.show()
 
-# example input data
-data = {
-    'column1': [1, 2, 3, 4, 5],
-    'column2': [2, 3, 4, 5, 6],
-    'column3': [3, 4, 5, 6, 7]
-}
+# example file path
+file_path = 'example.csv'
 
 # perform the exploratory data analysis
-perform_eda(data)
+perform_eda(file_path)
