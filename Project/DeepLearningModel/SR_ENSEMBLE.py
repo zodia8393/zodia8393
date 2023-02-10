@@ -25,6 +25,7 @@ def majority_voting(prediction1, prediction2, prediction3):
     predictions = [prediction1, prediction2, prediction3]
     return max(set(predictions), key = predictions.count)
 
+
 path = '/path/to/directory'
 files = os.listdir(path)
 
@@ -39,5 +40,42 @@ for wav_file in wav_files:
 df = pd.DataFrame(results, columns=['wav_file', 'result'])
 df.to_excel('results.xlsx', index=False)
 
+
+#DeepSpeech Model Pre-train Code
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader
+
+# Load pre-trained DeepSpeech model
+model = torch.hub.load('mozilla/DeepSpeech', 'deepspeech', pretrained=True)
+
+# Define the loss function
+criterion = nn.CTCLoss()
+
+# Define the optimizer
+optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+
+# Load the training data
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+
+# Train the model
+for epoch in range(num_epochs):
+    for i, (inputs, targets) in enumerate(train_loader):
+        inputs = inputs.to(device)
+        targets = targets.to(device)
+
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = criterion(outputs, targets)
+        loss.backward()
+        optimizer.step()
+
+    # Print the training progress
+    if (epoch+1) % print_every == 0:
+        print("Epoch [{}/{}], Loss: {:.4f}".format(epoch+1, num_epochs, loss.item()))
+
+# Save the fine-tuned model
+torch.save(model.state_dict(), 'deepspeech_finetuned.pth')
 
     
