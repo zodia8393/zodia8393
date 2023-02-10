@@ -56,8 +56,8 @@ criterion = nn.CTCLoss()
 # Define the optimizer
 optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-# Load the training data
-train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+# Load the training data  (train_dataset = Youtube Video To Wav Audio File)
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)   
 
 # Train the model
 for epoch in range(num_epochs):
