@@ -14,16 +14,22 @@ required_modules = ["os", "re", "time", "requests","selenium","moviepy","tkinter
 for module_name in required_modules:
     install_module(module_name)
 
-#import os
-#import re
-#import time
-#import requests
-#from selenium import webdriver
-#from moviepy.editor import *
-#import tkinter as tk
+import os
+import re
+import time
+import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from moviepy.editor import *
+import tkinter as tk
 
-# initialize a Chrome browser
-browser = webdriver.Chrome()
+
+# set the options to run the browser in headless mode
+options = Options()
+options.add_argument('--headless')
+
+# initialize a Chrome browser in headless mode
+browser = webdriver.Chrome(options=options)
 browser.get("https://www.youtube.com/")
 
 # define the function to download and convert the videos
