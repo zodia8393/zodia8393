@@ -1,15 +1,26 @@
-#Youtube_Video_Download_Converter
+import importlib
 
-import os
-import re
-import time
-import requests
-from selenium import webdriver
-from moviepy.editor import *
-import tkinter as tk
+def install_module(module_name):
+    try:
+        importlib.import_module(module_name)
+    except ImportError:
+        import subprocess
+        subprocess.check_call([
+            "pip", "install", module_name
+        ])
 
-# list of search terms
-search_terms = ["search term 1", "search term 2", "search term 3"]
+required_modules = ["os", "re", "time", "requests","selenium","moviepy","tkinter"]
+
+for module_name in required_modules:
+    install_module(module_name)
+
+#import os
+#import re
+#import time
+#import requests
+#from selenium import webdriver
+#from moviepy.editor import *
+#import tkinter as tk
 
 # initialize a Chrome browser
 browser = webdriver.Chrome()
@@ -17,6 +28,8 @@ browser.get("https://www.youtube.com/")
 
 # define the function to download and convert the videos
 def download_convert_videos():
+    search_terms = search_term_entry.get().split(",")
+
     for search_term in search_terms:
         # search for the desired video
         search_box = browser.find_element_by_xpath("//input[@id='search']")
@@ -57,6 +70,12 @@ def download_convert_videos():
 # create the GUI screen
 root = tk.Tk()
 root.title("Download and Convert Videos")
+
+# add a label and entry to enter search terms
+search_term_label = tk.Label(root, text="Search Terms (separated by commas):")
+search_term_label.pack()
+search_term_entry = tk.Entry(root)
+search_term_entry.pack()
 
 # add a button to download and convert the videos
 button = tk.Button(root, text="Download and Convert Videos", command=download_convert_videos)
