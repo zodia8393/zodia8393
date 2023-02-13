@@ -1,0 +1,11 @@
+This project allows users to download the top 10 videos of YouTube keywords and convert them into voice files, 
+derive better voice recognition results using deep learning models for voice recognition, extract keywords using text mining techniques, and summarize sentences.
+
+이 프로젝트는 유튜브 키워드 입력시 조회수 상위 10개의 영상을 다운로드 받아
+이를 음성파일로 변환하고 이를 음성인식을 위한 딥러닝 모델을 활용하여 보다 나은 음성인식결과물을 도출해내고 
+이를 텍스트마이닝 기법을 활용하여 키워드를 추출하고 문장을 요약함으로써 검색어에 대한 키워드와 요약본을 얻을수있는 프로젝트입니다.
+
+Deep learning model used: DeepSpeech, PyTorch_Kaldi model, and SpeechRecognition library combined.
+사용한 딥러닝 모델 : DeepSpeech,PyTorch_Kaldi모델 그리고 SpeechRecognition라이브러리가  합쳐진 모델
+
+-미완성-
