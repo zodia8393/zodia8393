@@ -13,6 +13,12 @@ required_modules = ["os", "re", "time", "requests","selenium","moviepy","tkinter
 
 for module_name in required_modules:
     install_module(module_name)
+    
+import selenium
+
+current_version = selenium.__version__
+if LooseVersion(current_version) > LooseVersion("4.0.0"):
+    !pip install selenium==4.0.0
 
 import os
 import re
