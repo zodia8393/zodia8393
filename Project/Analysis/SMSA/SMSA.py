@@ -1,18 +1,248 @@
 #Social Media Sentiment Analysis
 
 #Guide Line
-#데이터 수집: 분석하고자 하는 주제나 감정과 관련된 소셜 미디어 게시물의 크고 다양한 데이터 세트를 수집합니다. 데이터의 출처와 언어를 고려하여 대상 사용자를 대표하는지 확인하십시오.
+import tweepy
 
-#전처리: URL, 해시태그, 이모티콘과 같은 관련 없는 정보를 제거하기 위해 데이터를 정리하고 전처리합니다. 데이터를 토큰화하고 분석에 사용할 수 있는 숫자 표현으로 변환합니다.
+# Set up authentication keys
+consumer_key = 'your_consumer_key'
+consumer_secret = 'your_consumer_secret'
+access_token = 'your_access_token'
+access_token_secret = 'your_access_token_secret'
 
-#감정 주석: 데이터에 주석을 달아 각 게시물에 해당하는 감정으로 레이블을 지정합니다. 이 작업은 수동으로 수행하거나 자동 주석 도구를 사용하여 수행할 수 있습니다.
+# Authenticate with Twitter API
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
 
-#특징 추출: 분석 중인 감정과 관련된 특징을 데이터에서 추출합니다. 여기에는 단어 빈도와 같은 어휘적 특징이나 문장 구조와 같은 구문적 특징이 포함될 수 있다.
+# Create API object
+api = tweepy.API(auth)
 
-#모델 선택: 지원 벡터 머신(SVM) 또는 반복 신경망(RNN)과 같은 감정 분석에 적합한 머신 러닝 모델을 선택한다. 정확도, 정밀도 및 리콜과 같은 적절한 메트릭을 사용하여 모델의 성능을 평가합니다.
+# Define search query and specify language
+query = 'your_topic'
+language = 'en'
 
-#모델 평가: 테스트 데이터 세트에서 모델의 성능을 평가합니다. 결과를 분석하여 모델의 장점과 단점을 이해하고 필요한 수정을 통해 모델의 성능을 개선합니다.
+# Define list to store tweets
+tweets = []
 
-#시각화: 감정 분석 결과를 시각화하여 이해하고 해석하기 쉽게 합니다. 여기에는 감정 분포, 단어 구름 또는 열 지도의 플롯이 포함될 수 있습니다.
+# Use Cursor to collect tweets
+for tweet in tweepy.Cursor(api.search_tweets,
+                           q=query,
+                           lang=language,
+                           tweet_mode='extended').items(1000):
+    tweets.append(tweet.full_text)
 
-#해석: 감정 분석 결과를 해석하여 대상 청중의 감정에 대한 통찰력을 얻습니다. 표현되는 감정에 대한 포괄적인 분석을 제공하기 위해 인구통계학, 맥락 및 감정과 같은 요소를 고려한다.
+# Print the first 5 tweets
+print(tweets[:5])
+
+import re
+import string
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
+# Define function to preprocess a single tweet
+def preprocess_tweet(tweet):
+    # Remove URLs
+    tweet = re.sub(r'http\S+', '', tweet)
+    
+    # Remove hashtags and mentions
+    tweet = re.sub(r'@\w+|#\w+', '', tweet)
+    
+    # Remove punctuation
+    tweet = tweet.translate(str.maketrans('', '', string.punctuation))
+    
+    # Convert to lowercase
+    tweet = tweet.lower()
+    
+    # Tokenize tweet
+    tokens = word_tokenize(tweet)
+    
+    # Remove stopwords
+    stop_words = set(stopwords.words('english'))
+    filtered_tokens = [token for token in tokens if token not in stop_words]
+    
+    # Lemmatize tokens
+    lemmatizer = WordNetLemmatizer()
+    lemmatized_tokens = [lemmatizer.lemmatize(token) for token in filtered_tokens]
+    
+    # Join tokens back into string
+    preprocessed_tweet = ' '.join(lemmatized_tokens)
+    
+    return preprocessed_tweet
+
+# Define function to preprocess a list of tweets
+def preprocess_tweets(tweets):
+    preprocessed_tweets = []
+    for tweet in tweets:
+        preprocessed_tweet = preprocess_tweet(tweet)
+        preprocessed_tweets.append(preprocessed_tweet)
+    return preprocessed_tweets
+
+# Example usage
+tweets = ['This is a sample tweet with #hashtags and @mentions!',
+          'Here is another tweet, with a link: https://www.example.com',
+          'I love social media sentiment analysis!']
+preprocessed_tweets = preprocess_tweets(tweets)
+print(preprocessed_tweets)
+
+from textblob import TextBlob
+
+# Define function to annotate a single tweet with its polarity and subjectivity
+def annotate_tweet(tweet):
+    blob = TextBlob(tweet)
+    polarity = blob.sentiment.polarity
+    subjectivity = blob.sentiment.subjectivity
+    return {'tweet': tweet, 'polarity': polarity, 'subjectivity': subjectivity}
+
+# Define function to annotate a list of tweets with their polarity and subjectivity
+def annotate_tweets(tweets):
+    annotated_tweets = []
+    for tweet in tweets:
+        annotated_tweet = annotate_tweet(tweet)
+        annotated_tweets.append(annotated_tweet)
+    return annotated_tweets
+
+# Example usage
+tweets = ['I love social media sentiment analysis!', 'This is a terrible day.']
+annotated_tweets = annotate_tweets(tweets)
+for tweet in annotated_tweets:
+    print(tweet)
+
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.probability import FreqDist
+
+# Define function to extract features from a list of annotated tweets
+def extract_features(annotated_tweets):
+    # Create a list of all words in the tweets
+    words = [word for tweet in annotated_tweets for word in word_tokenize(tweet['tweet'])]
+    # Calculate the frequency distribution of words
+    fdist = FreqDist(words)
+    # Extract the most common words and their frequencies
+    top_words = fdist.most_common(10)
+    features = {}
+    # Add each word and its frequency to the features dictionary
+    for word, freq in top_words:
+        features[word] = freq
+    # Add the average polarity and subjectivity of the tweets to the features dictionary
+    polarity = sum([tweet['polarity'] for tweet in annotated_tweets])/len(annotated_tweets)
+    subjectivity = sum([tweet['subjectivity'] for tweet in annotated_tweets])/len(annotated_tweets)
+    features['polarity'] = polarity
+    features['subjectivity'] = subjectivity
+    return features
+
+# Example usage
+tweets = ['I love social media sentiment analysis!', 'This is a terrible day.']
+annotated_tweets = annotate_tweets(tweets)
+features = extract_features(annotated_tweets)
+print(features)
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.svm import LinearSVC
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+# Load the annotated data and extract features
+annotated_tweets = load_annotated_data('tweets.csv')
+features = extract_features(annotated_tweets)
+
+# Convert the annotated data into a bag of words representation
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform([tweet['tweet'] for tweet in annotated_tweets])
+y = [tweet['label'] for tweet in annotated_tweets]
+
+# Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train a linear support vector machine (SVM) model
+model = LinearSVC()
+model.fit(X_train, y_train)
+
+# Evaluate the model on the test set
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted')
+recall = recall_score(y_test, y_pred, average='weighted')
+print(f'Accuracy: {accuracy:.2f}, Precision: {precision:.2f}, Recall: {recall:.2f}')
+
+from sklearn.metrics import classification_report
+
+# Load the annotated data and extract features
+annotated_tweets = load_annotated_data('tweets.csv')
+features = extract_features(annotated_tweets)
+
+# Train a linear support vector machine (SVM) model
+model = LinearSVC()
+model.fit(X, y)
+
+# Make predictions on a test set and print a classification report
+test_tweets = load_test_data('test_tweets.csv')
+X_test = vectorizer.transform([tweet['tweet'] for tweet in test_tweets])
+y_test = [tweet['label'] for tweet in test_tweets]
+y_pred = model.predict(X_test)
+print(classification_report(y_test, y_pred))
+
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+# Load the annotated data and extract features
+annotated_tweets = load_annotated_data('tweets.csv')
+features = extract_features(annotated_tweets)
+
+# Train a linear support vector machine (SVM) model
+model = LinearSVC()
+model.fit(X, y)
+
+# Get the most informative features for each class
+n = 50  # number of features to display
+classes = model.classes_
+coef = model.coef_
+top_positive = sorted(zip(coef[0], features), reverse=True)[:n]
+top_negative = sorted(zip(coef[1], features), reverse=True)[:n]
+
+# Create a word cloud for positive and negative features
+positive_text = ' '.join([f[1] for f in top_positive])
+negative_text = ' '.join([f[1] for f in top_negative])
+positive_wordcloud = WordCloud(background_color='white').generate(positive_text)
+negative_wordcloud = WordCloud(background_color='white').generate(negative_text)
+
+# Display the word clouds using matplotlib
+plt.subplot(121)
+plt.imshow(positive_wordcloud, interpolation='bilinear')
+plt.axis('off')
+plt.title('Positive Words')
+plt.subplot(122)
+plt.imshow(negative_wordcloud, interpolation='bilinear')
+plt.axis('off')
+plt.title('Negative Words')
+plt.show()
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the annotated data and extract features
+annotated_tweets = load_annotated_data('tweets.csv')
+features = extract_features(annotated_tweets)
+
+# Train a linear support vector machine (SVM) model
+model = LinearSVC()
+model.fit(X, y)
+
+# Make predictions on a test dataset
+test_tweets = load_test_data('test_tweets.csv')
+test_features = extract_features(test_tweets)
+y_pred = model.predict(test_features)
+
+# Load demographic information for the test dataset
+demographics = pd.read_csv('test_demographics.csv')
+
+# Compute sentiment distribution for each demographic group
+sentiment_counts = demographics.groupby('gender')['sentiment'].value_counts(normalize=True)
+
+# Plot the sentiment distribution for each demographic group
+fig, ax = plt.subplots()
+sentiment_counts.unstack().plot(kind='bar', stacked=True, ax=ax)
+ax.set_xlabel('Gender')
+ax.set_ylabel('Proportion of Tweets')
+ax.set_title('Sentiment Distribution by Gender')
+plt.show()
