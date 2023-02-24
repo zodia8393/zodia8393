@@ -6,6 +6,39 @@ task = "censor_personal_info"
 # Choose a model or analysis method that is appropriate for your problem and data. For example, you might choose a deep 
 # learning model like a convolutional neural network (CNN) or a recurrent neural network (RNN) with attention mechanisms.
 
+import subprocess
+
+def ensure_packages_installed(packages):
+    """
+    Checks if the specified packages are installed and up-to-date. If not, installs or upgrades them.
+    """
+    for package in packages:
+        try:
+            # Check if the package is installed and get its version
+            result = subprocess.run(["pip", "show", package], capture_output=True, check=True, text=True)
+            installed_version = None
+            for line in result.stdout.splitlines():
+                if line.startswith("Version:"):
+                    installed_version = line.split(":")[1].strip()
+                    break
+
+            # Check if the package is up-to-date
+            latest_version = subprocess.check_output(["pip", "install", "--no-cache-dir", "--upgrade", package, "-q", "--no-input"], stderr=subprocess.STDOUT).decode().strip()
+            if installed_version is not None and latest_version == installed_version:
+                print(f"{package} is already up-to-date ({latest_version}).")
+            else:
+                print(f"{package} was updated from {installed_version} to {latest_version}.")
+        except subprocess.CalledProcessError as e:
+            # Package is not installed, so install it
+            print(f"{package} is not installed, so installing...")
+            subprocess.run(["pip", "install", "--no-cache-dir", package, "-q", "--no-input"], check=True)
+
+    print("All packages are installed and up-to-date!")
+    
+packages = ["numpy", "pandas", "matplotlib"] #사용법 예시 다른 패키지로 변경가능
+ensure_packages_installed(packages)
+
+
 from transformers import pipeline
 
 nlp_model = "distilbert-base-uncased"
