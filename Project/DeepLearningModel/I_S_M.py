@@ -1,4 +1,4 @@
-#Image Synthesize Model
+#Image Synthesize Model Prototype
 
 import os
 import random
