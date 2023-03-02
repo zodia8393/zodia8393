@@ -3,7 +3,9 @@
 - 🌱 I’m currently learning ...ML & DL (Python)
 - 📫 How to reach me ... mail me on chash8393@gmail.com
 
-- I am currently working at KIT, a government-funded research institute, and I am developing AI for image data processing.
+"As an AI enthusiast, I am passionate about developing innovative AI models for various applications, including data analysis, image processing, and natural language processing (NLP). My goal is to leverage the latest advances in machine learning and deep learning to solve complex problems and create value for businesses and society."
+
+
 
 
 <!---
