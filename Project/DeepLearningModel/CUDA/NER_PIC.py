@@ -16,7 +16,7 @@ import re
 # Step 2: Prepare the dataset
 
 # Load the dataset
-dataset = load_dataset("path_to_dataset", split="train")
+dataset = load_dataset("text", data_files={"train": "path_to_train_dataset.txt"})
 
 # Define the labels we want to identify and censor
 labels = ["name", "address", "phone", "email", "ssn", "passport", "dl", "biometric", "financial", "health"]
@@ -79,7 +79,6 @@ trainer = Trainer(
 trainer.train()
 
 # Step 4: Use the fine-tuned model to censor text
-
 import os
 
 def censor_text(filename):
@@ -97,45 +96,31 @@ def censor_text(filename):
     tokens = tokenizer.encode(text, add_special_tokens=False)
 
     # Make predictions using the fine-tuned model
-    model_input = torch.tensor([tokens])
-    outputs = model(model_input)
-    predictions = outputs.logits.argmax(-1)[0]
+    inputs = torch.tensor([tokens])
+    with torch.no_grad():
+        predictions = model(inputs)[0]
 
-    # Replace identified personal information with censoring symbols
-    censored_text = text
-    for i, token in enumerate(tokens):
-        label = predictions[i]
-        if label > 0:
-            label_name = labels[label - 1]
-            if label_name == "name":
-                censored_text = re.sub(r"\b\w+\b", "[NAME]", censored_text, count=1)
-            elif label_name == "address":
-                censored_text = re.sub(r"[A-Za-z0-9'\.\-\#\s]+", "[ADDRESS]", censored_text, count=1)
-            elif label_name == "phone":
-                censored_text = re.sub(r"\+?(\d[\d\-\.\(\)\s]+[\d])", "[PHONE]", censored_text, count=1)
-            elif label_name == "email":
-                censored_text = re.sub(r"\S+@\S+", "[EMAIL]", censored_text, count=1)
-            elif label_name == "ssn":
-                censored_text = re.sub(r"\d{3}-\d{2}-\d{4}", "[SSN]", censored_text, count=1)
-            elif label_name == "passport":
-                censored_text = re.sub(r"[A-Z]{1}\d{8}", "[PASSPORT]", censored_text, count=1)
-            elif label_name == "dl":
-                censored_text = re.sub(r"[A-Z]{1}\d{7}", "[DRIVER'S LICENSE]", censored_text, count=1)
-            elif label_name == "biometric":
-                censored_text = re.sub(r"[A-Za-z0-9/\-\#\s]+", "[BIOMETRIC]", censored_text, count=1)
-            elif label_name == "financial":
-                censored_text = re.sub(r"\d+((\.\d+)+)?", "[FINANCIAL]", censored_text, count=1)
-            elif label_name == "health":
-                censored_text = re.sub(r"[A-Za-z0-9'\.\-\#\s]+", "[HEALTH]", censored_text, count=1)
+    # Convert predictions to labels
+    predicted_labels = predictions.argmax(dim=2)[0]
 
-    # Write the censored text to a new file with the same name as the original file
-    new_filename = os.path.splitext(filename)[0] + '_censored' + ext
-    with open(new_filename, 'w', encoding='utf-8') as f:
+    # Create a list of words and their labels
+    words = tokenizer.convert_ids_to_tokens(tokens)
+    labels = [labels[predicted_label] for predicted_label in predicted_labels]
+
+    # Censor personal information
+    censored_words = []
+    for word, label in zip(words, labels):
+        if label in ["name", "address", "phone", "email", "ssn", "passport", "dl", "biometric", "financial", "health"]:
+            censored_words.append("[CENSORED]")
+        else:
+            censored_words.append(word)
+
+    # Join censored words into text
+    censored_text = " ".join(censored_words)
+
+    # Write censored text to file
+    censored_filename = os.path.splitext(filename)[0] + "_censored" + ext
+    with open(censored_filename, 'w', encoding='utf-8') as f:
         f.write(censored_text)
 
-    return censored_text
-# Censor the personal information in the text
-censored_text = censor_text()
-
-# Print the censored text
-print(censored_text)
+    print("Censored text saved to:", censored_filename)
