@@ -80,8 +80,19 @@ trainer.train()
 
 # Step 4: Use the fine-tuned model to censor text
 
-# Define a function to censor text
-def censor_text(text):
+import os
+
+def censor_text(filename):
+    # Check file extension
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in ['.txt', '.docx', '.pdf']:
+        print("Unsupported file extension:", ext)
+        return
+
+    # Read file contents
+    with open(filename, 'r', encoding='utf-8') as f:
+        text = f.read()
+
     # Tokenize the text
     tokens = tokenizer.encode(text, add_special_tokens=False)
 
@@ -117,8 +128,12 @@ def censor_text(text):
             elif label_name == "health":
                 censored_text = re.sub(r"[A-Za-z0-9'\.\-\#\s]+", "[HEALTH]", censored_text, count=1)
 
-    return censored_text
+    # Write the censored text to a new file with the same name as the original file
+    new_filename = os.path.splitext(filename)[0] + '_censored' + ext
+    with open(new_filename, 'w', encoding='utf-8') as f:
+        f.write(censored_text)
 
+    return censored_text
 # Censor the personal information in the text
 censored_text = censor_text(text)
 
