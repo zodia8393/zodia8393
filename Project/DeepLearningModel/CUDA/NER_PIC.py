@@ -135,7 +135,7 @@ def censor_text(filename):
 
     return censored_text
 # Censor the personal information in the text
-censored_text = censor_text(text)
+censored_text = censor_text()
 
 # Print the censored text
 print(censored_text)
