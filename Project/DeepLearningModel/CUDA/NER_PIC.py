@@ -13,6 +13,9 @@ import re
 # !pip install transformers
 # !pip install datasets
 
+!wget https://korquad.github.io/dataset/KorEng-CV.tar.gz
+!tar -zxvf KorEng-CV.tar.gz
+
 # Step 2: Prepare the dataset
 
 # Load the dataset
