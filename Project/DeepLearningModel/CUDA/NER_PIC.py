@@ -16,7 +16,10 @@ import re
 # Step 2: Prepare the dataset
 
 # Load the dataset
-dataset = load_dataset("text", data_files={"train": "path_to_train_dataset.txt"})
+dataset = load_dataset("text", data_files={
+                        "train": "path_to_train_dataset.txt",
+                        "test": "path_to_test_dataset.txt",
+                        "validation": "path_to_validation_dataset.txt"})
 
 # Define the labels we want to identify and censor
 labels = ["name", "address", "phone", "email", "ssn", "passport", "dl", "biometric", "financial", "health"]
