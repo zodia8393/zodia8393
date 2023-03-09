@@ -35,7 +35,7 @@ def ensure_packages_installed(packages):
 
     print("All packages are installed and up-to-date!")
     
-packages = ["transformers","pytorch","sklearn"] #사용법 예시 다른 패키지로 변경가능
+packages = ["transformers","torch","sklearn"] #사용법 예시 다른 패키지로 변경가능
 ensure_packages_installed(packages)
 
 
