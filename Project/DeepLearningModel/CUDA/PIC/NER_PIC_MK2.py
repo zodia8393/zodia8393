@@ -1,5 +1,7 @@
 #NER PERSONAL INFORMATION CENSOR MODEL PROTOTYPE IMPROVED VERSION
 
+#각 모듈의 프로토타입 코드입니다
+
 import torch
 from transformers import AutoTokenizer
 from torch.utils.data import Dataset, DataLoader
