@@ -1,0 +1,40 @@
+import re
+import datetime
+import pandas as pd
+import openai
+
+# GPT-3 인증키 설정
+openai.api_key = "INSERT_YOUR_API_KEY_HERE"
+
+# 텍스트 파일 읽기
+with open("kakao_chat.txt", "r", encoding="utf-8") as f:
+    text = f.read()
+
+# 대화내용 파싱하기
+pattern = r"\[(.*?)\] (.*?)(?= \[|$)"
+matches = re.findall(pattern, text, flags=re.DOTALL)
+
+# 대화내용 전처리하기
+rows = []
+for match in matches:
+    time_str, content = match
+    speaker, time = time_str.split("] [")
+    time = datetime.datetime.strptime(time, "%Y년 %m월 %d일 %a %p %I:%M")
+    rows.append([time, speaker[1:], content])
+
+# 대화내용을 말하는 사람별, 날짜별로 그룹화하기
+df = pd.DataFrame(rows, columns=["time", "speaker", "content"])
+df = df.groupby([df["time"].dt.date, "speaker"]).agg({"content": lambda x: "\n".join(x)})
+
+# GPT-3 모델을 사용해서 대화내용 요약하기
+for (date, speaker), row in df.iterrows():
+    summary = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=row["content"],
+        max_tokens=60,
+        n=1,
+        stop=None,
+        temperature=0.5,
+    ).choices[0].text.strip()
+    print(f"Date: {date}, Speaker: {speaker}")
+    print(f"Summary: {summary}")
