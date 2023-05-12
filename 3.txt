@@ -1,0 +1,1 @@
+atrous convolution, convolution,ROI pooling,RPN,그래디언트 소실,잔차연결,잔차블록,정밀도,재현율 개념 설명
