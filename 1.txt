@@ -1,1 +1,34 @@
-https://gamma.app/8rqtqkorvqz0d3m/join?code=7iuse1288hpr6gl&r=buhz6sl612mztvc
+import pyautogui
+import keyboard
+import time
+
+def handle_keypad_1():
+    pyautogui.press('tab')
+    time.sleep(0.1)
+    pyautogui.press('tab')
+    time.sleep(0.1)
+    pyautogui.press('tab')
+    time.sleep(0.1)
+    pyautogui.write('448')
+    time.sleep(0.1)
+    pyautogui.press('tab')
+    time.sleep(0.1)
+    pyautogui.write('448')
+
+def handle_keypad_2():
+    pyautogui.hotkey('ctrl', 'e')
+    time.sleep(1)
+    screenWidth, screenHeight = pyautogui.size()
+    pyautogui.click(screenWidth / 2, screenHeight / 2)
+
+def main():
+    while True:
+        if keyboard.is_pressed('numpad1'):  # 넘패드 1번 버튼 감지
+            handle_keypad_1()
+            while keyboard.is_pressed('numpad1'): pass  # 1번 버튼을 떼기 전까지 기다림
+        elif keyboard.is_pressed('numpad2'):  # 넘패드 2번 버튼 감지
+            handle_keypad_2()
+            while keyboard.is_pressed('numpad2'): pass  # 2번 버튼을 떼기 전까지 기다림
+
+if __name__ == "__main__":
+    main()
