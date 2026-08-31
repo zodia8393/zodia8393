@@ -15,7 +15,8 @@
 | [CatalogForge](https://github.com/zodia8393/catalog-forge) | 외부 페이지 수집의 retry, 중복, schema drift, 장애복구 | recovery rehearsal, benchmark, test |
 | 개인 ETF 자동적립 시스템 | 외부 API 불명확 상태의 재요청 차단과 reconciliation | 계좌정보를 제외한 비식별 운영 사례 |
 
-MobilityFlow의 PySpark는 `local[2]` 변환 검증 범위이며 AWS 배포는 Terraform 검증 범위입니다.
-실제 AWS EC2·S3·systemd 운영 경험은 비공개 개인 자동화 시스템에서 수행했습니다.
+MobilityFlow는 AWS S3·ECR·ECS cluster·CloudWatch baseline을 실제 배포했습니다. 다만 Airflow·PySpark
+runtime은 local이며 ECR security gate로 ECS running task는 0입니다. AWS EC2·S3·systemd 서비스 운영은
+비공개 개인 자동화 시스템에서 수행했습니다.
 
 Contact: [chohj_1019@naver.com](mailto:chohj_1019@naver.com)
